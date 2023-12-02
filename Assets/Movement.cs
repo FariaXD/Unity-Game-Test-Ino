@@ -5,26 +5,45 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
     private Rigidbody2D rb;
-    private float moveSpeed = 1f;
-    public Vector2 movement;
-    // Start is called before the first frame update
-    private void Awake() {
-        rb = GetComponent<Rigidbody2D>();
-    }
-    void Start()
+    private Animator anim;
+    public Camera cam;
+    private float moveSpeed = 3f;
+    public Vector2 movement, mousePos;
+    public bool attacking = false;
+
+    private void Awake() 
     {
-        
+        rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Move();
+        ControllerInputs();
+        Animate();
     }
 
-    private void Move(){
+    void FixedUpdate(){
+        Move();
+        MeleeAttack();
+    }
+    private void ControllerInputs(){
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
+    }
+    private void Move()
+    {
         rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+    }
+    private void MeleeAttack(){
+        if(Input.GetKeyDown(KeyCode.X)){
+            anim.SetTrigger("Melee");
+        }
+    }
+    private void Animate()
+    {
+        anim.SetFloat("x", movement.x);
+        anim.SetFloat("y", movement.y);
+        anim.SetFloat("speed", movement.sqrMagnitude);
     }
 }
